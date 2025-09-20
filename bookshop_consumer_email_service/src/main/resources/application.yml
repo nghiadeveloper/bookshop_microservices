@@ -10,7 +10,7 @@ spring:
     properties:
       mail.smtp.auth: true
       mail.smtp.starttls.enable: true
-      mail.debug: true
+      mail.debug: false
   kafka:
     bootstrap-servers: localhost:9094
     consumer:
