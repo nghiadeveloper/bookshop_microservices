@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: email-service
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: hieunghia.95731@gmail.com
+    password: mxznlvpeuoxefdzm
+    protocol: smtp
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+      mail.debug: true
+  kafka:
+    bootstrap-servers: localhost:9094
+    consumer:
+      enable-auto-commit: true
+      auto-offset-reset: earliest
+      group-id: email-service-group
