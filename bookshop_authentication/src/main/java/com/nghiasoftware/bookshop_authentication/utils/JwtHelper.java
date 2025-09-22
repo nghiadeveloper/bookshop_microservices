@@ -14,10 +14,10 @@ public class JwtHelper {
     @Value("${jwt.secret}")
     private String secretKey;
 
-    public String generateToken(Object data) {
+    public String generateToken(String data) {
         SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
         return io.jsonwebtoken.Jwts.builder()
-                .subject("Hello")
+                .subject(data)
                 .signWith(key)
                 .compact();
     }

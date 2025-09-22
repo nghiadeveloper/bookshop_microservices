@@ -26,6 +26,10 @@ public class Users {
     private LocalDateTime createdDate;
     private LocalDateTime updatedDate;
 
+    @ManyToOne
+    @JoinColumn(name = "role_id", nullable = false)
+    private Roles role;
+
     @PrePersist
     public void prePersist() {
         this.id = UUID.randomUUID().toString();

@@ -2,6 +2,7 @@ package com.nghiasoftware.bookshop_authentication.services.imp;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nghiasoftware.bookshop_authentication.dto.TokenDTO;
 import com.nghiasoftware.bookshop_authentication.dto.UserDTO;
 import com.nghiasoftware.bookshop_authentication.entity.Users;
 import com.nghiasoftware.bookshop_authentication.enumable.StatusUser;
@@ -18,6 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -51,7 +53,19 @@ public class AuthenticationServicesImp implements AuthenticationServices {
             blockUser(users);
             throw new DataNotFound("Invalid password for user: " + email);
         } else {
-            return jwtHelper.generateToken(users.getEmail());
+            TokenDTO tokenDTO = new TokenDTO();
+            tokenDTO.setEmail(users.getEmail());
+            tokenDTO.setRoles(List.of(users.getRole().getName()));
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            String jsonData = "";
+            try {
+                jsonData = objectMapper.writeValueAsString(tokenDTO);
+            } catch (Exception e) {
+                throw new DataNotFound("Error converting TokenDTO to JSON", e);
+            }
+
+            return jwtHelper.generateToken(jsonData);
         }
     }
 
@@ -81,6 +95,22 @@ public class AuthenticationServicesImp implements AuthenticationServices {
             kafkaTemplate.send("email", jsonData);
         } catch (Exception e) {
             throw new RuntimeException("Error converting UserDTO to JSON", e);
+        }
+    }
+
+    @Override
+    public List<String> decodeToken(String token) {
+        String data = jwtHelper.validateAndGetDataToken(token);
+        if(data == null || data.isEmpty()) {
+            throw new DataNotFound("Invalid token or token has expired.");
+        }
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            TokenDTO tokenDTO = objectMapper.readValue(data, TokenDTO.class);
+            return tokenDTO.getRoles();
+        } catch (Exception e) {
+            throw new DataNotFound("Error parsing token data.", e);
         }
     }
 
