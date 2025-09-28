@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @Getter
 @Setter
 public class CreateProductRequest {
@@ -11,5 +13,5 @@ public class CreateProductRequest {
     private String author;
     private int review;
     private double price;
-    private MultipartFile[] files;
+    private List<FileRequest> files;
 }
